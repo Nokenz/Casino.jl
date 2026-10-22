@@ -1,14 +1,35 @@
+ @enum BetType NumeroBet RougeBet NoirBet PairBet ImpairBet ManqueBet PasseBet
+
+ @enum NumberResult RougeNumber NoirNumber PairNumber ImpairNumber  ManqueNumber PasseNumber ZeroNumber
+
+ const RougeNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
+
 struct RouletteGame <: AbstractGame
 end
 
-mutable struct RouletteGamer <: AbstractGamer
-    capital::Float64
-end
 
 struct Pari
-    type_pari::String
+    numero::Int
+    type_pari::BetType
     mise::Float64
 end
+
+
+struct RouletteResult
+    numero::Int
+    pari::Pari
+    gain::Float64
+end
+
+
+mutable struct RouletteGamer <: AbstractGamer
+    capital::Float64
+    results::Vector{RouletteResult}
+end
+
+
+
+
 
 function bet!(roulette::RouletteGame, joueur::RouletteGamer, pari::Pari)
     pari_gagnant(pari, rand(roulette))
@@ -18,82 +39,74 @@ end
 
  Base.rand((roulette::RouletteGame)) = rand(0:36)
 
-rouge = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
 
 function couleur(numero)
     if numero == 0
-        return "vert"
-    elseif numero in rouge
-        return "rouge"
+        return ZeroNumber
+    elseif numero in RougeNumbers
+        return RougeNumber
     else
-        return "noir"
+        return NoirNumber
     end
 end
 
 function parite(numero)
     if numero == 0
-        return :aucune
+        return ZeroNumber
     elseif iseven(numero)
-        return :pair
-     else
-        return :impair
+        return PairNumber
+    else
+        return ImpairNumber
     end
 end
 
 function manque_passe(numero)
     if numero == 0
-        return "aucune"
+        return ZeroNumber
     elseif numero in 1:18
-        return "manque"
+        return ManqueNumber
     else
-        return "passe"
+        return PasseNumber
     end
 end
 
 
 function verifier_pari(pari::Pari, joueur::RouletteGamer)
 
-    types_valides = ["rouge","noir", "pair", "impair", "manque", "passe"] # gere le problemes des majuscules et minuscules
-    type = lowercase(pari.type_pari)
-    if !(type in types_valides)
-        error("Type de pari invalide. Les types valides sont : $(types_valides).")
-    elseif pari.mise <= 0
-        error("La mise doit être un montant positif.")
+    if pari.type_pari == NumeroBet && !(0 <= pari.numero <= 36)
+        return false
+     if !isfinite(pari.mise) || pari.mise <= 0
+        return false
     elseif pari.mise > joueur.capital
-        println("Vous n'avez pas assez de capital pour ce pari.")
         return false
     else
         println("Pari valide : $(pari.type_pari) avec une mise de $(pari.mise)€.")
         return true
     end
-    
 end
 
 function prelever_mise(joueur::RouletteGamer, pari::Pari)
-    if verifier_pari(pari, joueur)
-        joueur.capital = joueur.capital - pari.mise
-        println("Mise de $(pari.mise)€ prélevée. Capital restant : $(joueur.capital)€.")
+    if !verifier_pari(pari, joueur)
+        return false
     else
-        
-        joueur.capital = 0
-        println("Tu as tout perdu!")
+        joueur.capital -= pari.mise
+    return true
     end
 end
 
 function pari_gagnant(pari::Pari, numero::Int)
-    type=lowercase(pari.type_pari)
-
-    if type == "rouge" && lowercase(couleur(numero)) == "rouge"
+   
+    if pari.type_pari == RougeBet &&  couleur(numero) == RougeNumber
         return true
-    elseif type == "noir" && lowercase(couleur(numero)) == "noir"
+    elseif pari.type_pari == NoirBet &&  couleur(numero) == NoirNumber
         return true
-    elseif type == "pair" && parite(numero) == :pair
+    elseif pari.type_pari == PairBet && parite(numero) == PairNumber
         return true
-    elseif type == "impair" && parite(numero) == :impair
+    elseif pari.type_pari == ImpairBet && parite(numero) == ImpairNumber
         return true
-    elseif type == "manque" && lowercase(manque_passe(numero)) == "manque"
+    elseif pari.type_pari == ManqueBet && manque_passe(numero) == ManqueNumber
         return true
-    elseif type == "passe" && lowercase(manque_passe(numero)) == "passe"
+    elseif pari.type_pari == PasseBet && manque_passe(numero) == PasseNumber
         return true
     else
         return false
