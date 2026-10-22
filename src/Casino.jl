@@ -38,16 +38,15 @@ include("roulette.jl")
 #Craps
 export AbstractGame
 export AbstractGamer
+export ResultatCraps
 export passline
 export sumdes
+export lanceurcraps
 export dontpass
 export prop
 export dontcome
 export come
 
-
-
 include("craps.jl")
-
 
 end
