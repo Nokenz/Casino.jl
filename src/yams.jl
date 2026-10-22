@@ -1,11 +1,11 @@
-mutable struct Joueur_Yams
+mutable struct YamsGamer <: AbstractGamer
     nom::String
     solde::Float64
     nb_parties::Int
 end
 
 
-struct ResultatYams
+struct YamsGame <:AbstractGame
     des::Vector{Int}
     combinaison::String
     mise::Float64
@@ -40,21 +40,6 @@ function combinaison(des)
     end
 end
 
-#On lance nos des jusqu'à obtenir un Yams et regarde le nombre de lancés
-function lancer_jusqua_yams()
-    i = 0
-
-    while true
-        i += 1
-        des = rand(1:6,5)
-
-        if combinaison(des) == "yams"
-            break
-        end
-    end
-
-    return i
-end
 
 #On assigne un multiplicateur à chaque figure, ces multiplicateurs ont été calculé de sorte à ce que l'espérance de gain soit proche de 0,9 pour simuler un jeu de casino réaliste
 function multiplicateur(combinaison)
@@ -94,10 +79,10 @@ function jouer_yams(mise)
     comb = combinaison(des)
     montant = gain(mise, comb)
 
-    return ResultatYams(des, comb, mise, montant)
+    return YamsGame(des, comb, mise, montant)
 end
 
-function jouer_yams(joueur::Joueur_Yams, mise::Real)
+function jouer_yams(joueur::YamsGamer, mise::Real)
 
     # Vérifier que la mise est valide
     if mise <= 0
@@ -124,7 +109,7 @@ function jouer_yams(joueur::Joueur_Yams, mise::Real)
     return resultat
 end
 
-function simule_Yams(joueur::Joueur_Yams, nb::Int, mise::Real)
+function simule_Yams(joueur::YamsGamer, nb::Int, mise::Real)
 
     historique = Float64[joueur.solde]
 

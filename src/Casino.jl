@@ -7,10 +7,9 @@ abstract type AbstractGamer end
 abstract type AbstractGame end
 
 #Yams
-export Joueur_Yams
+export YamsGamer
 export ResultatYams
 export combinaison
-export lancer_jusqua_yams
 export multiplicateur
 export gain
 export jouer_yams
