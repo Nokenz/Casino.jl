@@ -27,7 +27,7 @@ end
 #a prends le 1er lancer de des
 #b prends tous les lancers sur le point
 #pari le plus general du craps (facile de gagner)
-function passline(a::Int,gamer:: AbstractGamer)
+function passline(a::Int, gamer:: AbstractGamer)
  bet=1
 if(a==7) || (a==11)
     #gagné
@@ -54,7 +54,6 @@ else
         gamer.capital=gamer.capital-gamer.mise
         res="perdu"
         end
-    
     end
 end
 return gamer, bet, res
@@ -150,6 +149,7 @@ return gamer, bet, res
 end
 
 #comme dontpass mais a placer n'import quand
+#a modifier pour gérer le come out roll personalisé (pareil pour come bet)
 function dontcome(a::Int,gamer:: AbstractGamer)
 bet=5
 if(a==7) || (a==11)
@@ -166,7 +166,6 @@ elseif(a==12)
     res="neutre"
 else
    #ResultatCraps.sumd=a
-
     b=lanceurcraps()
     while (b!=7) & (b!=a)
        b=sumdes()
